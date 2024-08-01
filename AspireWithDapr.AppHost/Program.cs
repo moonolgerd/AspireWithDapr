@@ -11,7 +11,7 @@ builder.AddDaprStateStore("statestore", new DaprComponentOptions
 {
     LocalPath = "C:\\Users\\Oleg\\.dapr\\components\\statestore.yaml"
 });
-builder.AddDaprPubSub("pubsub", new DaprComponentOptions
+var pubsub = builder.AddDaprPubSub("pubsub", new DaprComponentOptions
 {
     LocalPath = "C:\\Users\\Oleg\\.dapr\\components\\pubsub.yaml"
 });
@@ -26,6 +26,11 @@ builder.AddProject<Projects.AspireWithDapr_Web>("webfrontend")
     .WithExternalHttpEndpoints()
     .WithReference(cache)
     .WithReference(apiService);
+
+builder.AddProject<Projects.AspireWithDapr_Publisher>("publisher")
+    .WithDaprSidecar()
+    .WithExternalHttpEndpoints()
+    .WithReference(pubsub);
 
 // Workaround for https://github.com/dotnet/aspire/issues/2219
 if (builder.Configuration.GetValue<string>("DAPR_CLI_PATH") is { } daprCliPath)

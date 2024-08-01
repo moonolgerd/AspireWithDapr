@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AspireWithDapr.ApiService\AspireWithDapr.ApiService.csproj" />
+    <ProjectReference Include="..\AspireWithDapr.Publisher\AspireWithDapr.Publisher.csproj" />
     <ProjectReference Include="..\AspireWithDapr.Web\AspireWithDapr.Web.csproj" />
   </ItemGroup>
 

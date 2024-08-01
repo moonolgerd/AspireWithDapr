@@ -12,6 +12,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspireWithDapr.Web", "Aspir
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspireWithDapr.Shared", "AspireWithDapr.Shared\AspireWithDapr.Shared.csproj", "{CEFF3838-5981-4E17-92A0-7B5CEAC36AAE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspireWithDapr.Publisher", "AspireWithDapr.Publisher\AspireWithDapr.Publisher.csproj", "{0CB4E1FF-CD53-43B0-9151-1E0875906784}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{CEFF3838-5981-4E17-92A0-7B5CEAC36AAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CEFF3838-5981-4E17-92A0-7B5CEAC36AAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CEFF3838-5981-4E17-92A0-7B5CEAC36AAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CB4E1FF-CD53-43B0-9151-1E0875906784}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CB4E1FF-CD53-43B0-9151-1E0875906784}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CB4E1FF-CD53-43B0-9151-1E0875906784}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CB4E1FF-CD53-43B0-9151-1E0875906784}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -27,14 +27,17 @@ app.MapGet("/weatherforecast", async (IActorProxyFactory proxy) =>
     return forecasts;
 });
 
-app.MapPost("/weatherforecast", (IActorProxyFactory proxy) =>
+app.MapPost("/weatherforecast", async (IActorProxyFactory proxy) =>
 {
-
+    var actor = proxy.CreateActorProxy<IMyActor>(new ActorId("1"), nameof(WeatherActor));
+    Console.WriteLine("Received {actor}", await actor.GetWeatherForecasts());
 }).WithTopic("pubsub", "MyTopic");
 
 app.UseRouting();
 
 app.MapActorsHandlers();
+
+app.MapSubscribeHandler();
 
 app.MapDefaultEndpoints();
 
