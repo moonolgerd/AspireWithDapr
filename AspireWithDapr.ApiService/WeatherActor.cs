@@ -11,25 +11,6 @@ namespace AspireWithDapr.ApiService;
 /// </summary>
 public class WeatherActor(ActorHost host) : Actor(host), IMyActor
 {
-    private readonly string[] summaries =
-    [
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    ];
-
-    protected override async Task OnActivateAsync()
-    {
-        var forecast = Enumerable.Range(1, 5)
-            .Select(index =>
-            new WeatherForecast
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = summaries[Random.Shared.Next(summaries.Length)]
-            })
-            .ToArray();
-        await StateManager.TryAddStateAsync("forecast", forecast);
-    }
-
     /// <summary>
     /// Gets the weather forecasts.
     /// </summary>
@@ -38,6 +19,16 @@ public class WeatherActor(ActorHost host) : Actor(host), IMyActor
     {
         var forecast = await StateManager.TryGetStateAsync<WeatherForecast[]>("forecast");
         return forecast.Value;
+    }
+
+    public async Task AddWeatherForecast(WeatherForecast forecast)
+    {
+        var existing = await StateManager.GetOrAddStateAsync<WeatherForecast[]>("forecast", [forecast]);
+        
+        var list = existing.ToList();
+        list.Add(forecast);
+
+        await StateManager.SetStateAsync("forecast", list.ToArray());
     }
 }
 
@@ -51,4 +42,6 @@ public interface IMyActor : IActor
     /// </summary>
     /// <returns>The collection of weather forecasts.</returns>
     public Task<IEnumerable<WeatherForecast>> GetWeatherForecasts();
+
+    public Task AddWeatherForecast(WeatherForecast forecast);
 }

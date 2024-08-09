@@ -6,7 +6,7 @@ public record WeatherForecast
     {
     }
 
-    public DateOnly Date { get; set; } = new DateOnly();
+    public DateTime Date { get; set; } = DateTime.Now;
 
     public int TemperatureC { get; set; }
 
@@ -16,4 +16,11 @@ public record WeatherForecast
     /// Gets the temperature in Fahrenheit.
     /// </summary>
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+}
+
+public static class SharedConstants
+{
+    public const string PubsubName = "pubsub";
+    public const string TopicName = "MyTopic";
+
 }
