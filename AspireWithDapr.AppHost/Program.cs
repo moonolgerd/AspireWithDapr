@@ -3,20 +3,22 @@ using AspireWithDapr.AppHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+var profile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var cache = builder.AddRedis("cache", "redis/redis-stack", 6379);
 
 builder.AddDaprStateStore("statestore", new DaprComponentOptions
 {
-    LocalPath = "C:\\Users\\Oleg\\.dapr\\components\\statestore.yaml"
+    LocalPath = $"{profile}\\.dapr\\components\\statestore.yaml"
 });
 var pubsub = builder.AddDaprPubSub("pubsub", new DaprComponentOptions
 {
-    LocalPath = "C:\\Users\\Oleg\\.dapr\\components\\pubsub.yaml"
+    LocalPath = $"{profile}\\.dapr\\components\\pubsub.yaml"
 });
 
-builder.AddExecutable("dapr", "placement", "C:\\Users\\Oleg\\.dapr\\bin", "-port", "6050");
+builder.AddExecutable("dapr", "placement", $"{profile}\\.dapr\\bin", "-port", "6050");
 
 var apiService = builder.AddProject<Projects.AspireWithDapr_ApiService>("apiservice")
     .WithDaprSidecar("api");
@@ -32,13 +34,13 @@ builder.AddProject<Projects.AspireWithDapr_Publisher>("publisher")
     .WithExternalHttpEndpoints()
     .WithReference(pubsub);
 
-// Workaround for https://github.com/dotnet/aspire/issues/2219
-if (builder.Configuration.GetValue<string>("DAPR_CLI_PATH") is { } daprCliPath)
-{
-    builder.Services.Configure<DaprOptions>(options =>
-    {
-        options.DaprPath = daprCliPath;
-    });
-}
+//// Workaround for https://github.com/dotnet/aspire/issues/2219
+//if (builder.Configuration.GetValue<string>("DAPR_CLI_PATH") is { } daprCliPath)
+//{
+//    builder.Services.Configure<DaprOptions>(options =>
+//    {
+//        options.DaprPath = daprCliPath;
+//    });
+//}
 
 builder.Build().Run();
