@@ -18,7 +18,7 @@ public class PublisherHostedService(DaprClient daprClient) : BackgroundService
             };
             await daprClient.PublishEventAsync(SharedConstants.PubsubName, SharedConstants.TopicName, weatherForecast, stoppingToken);
             Console.WriteLine("Published data: " + weatherForecast);
-            await Task.Delay(5000, stoppingToken);
+            await Task.Delay(1000, stoppingToken);
         }
     }
 }
