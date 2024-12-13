@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-using System.Runtime.Serialization;
-using AspireWithDapr.Shared;
+﻿using AspireWithDapr.Shared;
 using Dapr.Actors;
 using Dapr.Actors.Runtime;
 
@@ -23,6 +21,7 @@ public class WeatherActor(ActorHost host) : Actor(host), IMyActor
 
     public async Task AddWeatherForecast(WeatherForecast forecast)
     {
+        Logger.LogInformation("Adding new {forecast}", forecast);
         var existing = await StateManager.GetOrAddStateAsync<WeatherForecast[]>("forecast", [forecast]);
         
         var list = existing.ToList();

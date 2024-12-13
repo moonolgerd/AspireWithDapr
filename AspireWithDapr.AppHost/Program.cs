@@ -20,7 +20,11 @@ var pubsub = builder.AddDaprPubSub("pubsub", new DaprComponentOptions
 
 builder.AddExecutable("dapr", "placement", $"{profile}\\.dapr\\bin", "-port", "6050");
 
+builder.AddExecutable("dashboard", "dashboard", $"{profile}\\.dapr\\bin", "-port", "9999")
+    .WithHttpEndpoint(9999, targetPort: 9999, isProxied: false);
+
 var apiService = builder.AddProject<Projects.AspireWithDapr_ApiService>("apiservice")
+    .WithReplicas(3)
     .WithDaprSidecar("api");
 
 builder.AddProject<Projects.AspireWithDapr_Web>("webfrontend")

@@ -3,6 +3,7 @@ using AspireWithDapr.Shared;
 using Dapr.Actors;
 using Dapr.Actors.Client;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,8 +30,10 @@ app.MapGet("/weatherforecast", async (IActorProxyFactory proxy) =>
     return forecasts;
 });
 
-app.MapPost("/weatherforecast", async ([FromBody] WeatherForecast forecast, IActorProxyFactory proxy) =>
+app.MapPost("/weatherforecast", async ([FromBody] WeatherForecast forecast, IActorProxyFactory proxy, ILogger<Program> logger) =>
 {
+    logger.LogInformation("Processing new forecast on {Id}", Environment.ProcessId);
+
     var actor = proxy.CreateActorProxy<IMyActor>(new ActorId("1"), nameof(WeatherActor));
     await actor.AddWeatherForecast(forecast);
 
