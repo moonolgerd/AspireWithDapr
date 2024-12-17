@@ -18,6 +18,10 @@ builder.Services.AddActors(options =>
     options.Actors.RegisterActor<WeatherActor>();
 });
 
+builder.Services
+    .AddGraphQLServer()
+    .AddQueryType<Query>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -48,5 +52,7 @@ app.MapSubscribeHandler();
 app.UseCloudEvents();
 
 app.MapDefaultEndpoints();
+
+app.MapGraphQL();
 
 app.Run();

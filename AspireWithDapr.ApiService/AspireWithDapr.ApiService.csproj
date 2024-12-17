@@ -4,6 +4,7 @@
     <PackageReference Include="Dapr.AspNetCore" Version="1.14.0" />
     <PackageReference Include="Dapr.Actors.AspNetCore" Version="1.14.0" />
     <PackageReference Include="System.Text.Json" Version="9.0.0" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="14.0.0" />
   </ItemGroup>
 
   <ItemGroup>
