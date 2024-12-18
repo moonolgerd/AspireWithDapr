@@ -1,7 +1,8 @@
 ﻿@page "/weather"
 @using AspireWithDapr.Shared
-@attribute [StreamRendering(true)]
-@attribute [OutputCache(Duration = 5)]
+@* @attribute [StreamRendering(true)]
+@attribute [OutputCache(Duration = 5)] *@
+@rendermode InteractiveServer
 
 @inject WeatherApiClient WeatherApi
 
@@ -10,6 +11,13 @@
 <h1>Weather</h1>
 
 <p>This component demonstrates showing data loaded from a backend API service.</p>
+
+<select title="Select a city" @bind=selectedCity @bind:after=Foo>
+    @foreach (var city in SharedCollections.Cities)
+    {
+        <option>@city</option>
+    }
+</select>
 
 @if (forecasts == null)
 {
@@ -41,10 +49,12 @@ else
 }
 
 @code {
+    private string selectedCity = "";
+
     private WeatherForecast[]? forecasts;
 
-    protected override async Task OnInitializedAsync()
+    private async Task Foo()
     {
-        forecasts = await WeatherApi.GetWeatherAsync();
+        forecasts = await WeatherApi.GetWeatherAsync(selectedCity);
     }
 }

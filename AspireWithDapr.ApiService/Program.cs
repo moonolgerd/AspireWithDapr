@@ -23,9 +23,9 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
 
-app.MapGet("/weatherforecast", async (IActorProxyFactory proxy) =>
+app.MapGet("/weatherforecast", async ([FromQuery] string city, IActorProxyFactory proxy) =>
 {
-    var actor = proxy.CreateActorProxy<IMyActor>(new ActorId("1"), nameof(WeatherActor));
+    var actor = proxy.CreateActorProxy<IMyActor>(new ActorId(city), nameof(WeatherActor));
     var forecasts = await actor.GetWeatherForecasts();
     return forecasts;
 });
@@ -34,7 +34,7 @@ app.MapPost("/weatherforecast", async ([FromBody] WeatherForecast forecast, IAct
 {
     logger.LogInformation("Processing new forecast on {Id}", Environment.ProcessId);
 
-    var actor = proxy.CreateActorProxy<IMyActor>(new ActorId("1"), nameof(WeatherActor));
+    var actor = proxy.CreateActorProxy<IMyActor>(new ActorId(forecast.City), nameof(WeatherActor));
     await actor.AddWeatherForecast(forecast);
 
 }).WithTopic("pubsub", "MyTopic");

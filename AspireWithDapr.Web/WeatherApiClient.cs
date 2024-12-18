@@ -5,8 +5,8 @@ namespace AspireWithDapr.Web;
 
 public class WeatherApiClient(DaprClient daprClient)
 {
-    public async Task<WeatherForecast[]> GetWeatherAsync()
+    public async Task<WeatherForecast[]> GetWeatherAsync(string city)
     {
-        return await daprClient.InvokeMethodAsync<WeatherForecast[]>(HttpMethod.Get, "api", "weatherforecast");
+        return await daprClient.InvokeMethodAsync<WeatherForecast[]>(HttpMethod.Get, "api", $"weatherforecast?city={city}");
     }
 }

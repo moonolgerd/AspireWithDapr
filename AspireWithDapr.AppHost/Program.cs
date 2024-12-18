@@ -38,13 +38,4 @@ builder.AddProject<Projects.AspireWithDapr_Publisher>("publisher")
     .WithExternalHttpEndpoints()
     .WithReference(pubsub);
 
-//// Workaround for https://github.com/dotnet/aspire/issues/2219
-//if (builder.Configuration.GetValue<string>("DAPR_CLI_PATH") is { } daprCliPath)
-//{
-//    builder.Services.Configure<DaprOptions>(options =>
-//    {
-//        options.DaprPath = daprCliPath;
-//    });
-//}
-
 builder.Build().Run();

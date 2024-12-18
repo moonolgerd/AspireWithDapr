@@ -15,19 +15,25 @@ public class WeatherActor(ActorHost host) : Actor(host), IMyActor
     /// <returns>The collection of weather forecasts.</returns>
     public async Task<IEnumerable<WeatherForecast>> GetWeatherForecasts()
     {
-        var forecast = await StateManager.TryGetStateAsync<WeatherForecast[]>("forecast");
-        return forecast.Value;
+        var forecast = await StateManager.TryGetStateAsync<WeatherForecast[]>(Id.GetId());
+        return forecast.HasValue ? forecast.Value : [];
     }
 
     public async Task AddWeatherForecast(WeatherForecast forecast)
     {
         Logger.LogInformation("Adding new {forecast}", forecast);
-        var existing = await StateManager.GetOrAddStateAsync<WeatherForecast[]>("forecast", [forecast]);
-        
+        var existing = await StateManager.GetOrAddStateAsync<WeatherForecast[]>(Id.GetId(), [forecast]);
+
         var list = existing.ToList();
+
+        if (list.Contains(forecast))
+        {
+            return;
+        }
+
         list.Add(forecast);
 
-        await StateManager.SetStateAsync("forecast", list.ToArray());
+        await StateManager.SetStateAsync(Id.GetId(), list.ToArray());
     }
 }
 
