@@ -11,11 +11,11 @@ var cache = builder.AddRedis("cache", "redis/redis-stack", 6379);
 
 builder.AddDaprStateStore("statestore", new DaprComponentOptions
 {
-    LocalPath = $"{profile}\\.dapr\\components\\statestore.yaml"
+    LocalPath = "../statestore.yaml"
 });
 var pubsub = builder.AddDaprPubSub("pubsub", new DaprComponentOptions
 {
-    LocalPath = $"{profile}\\.dapr\\components\\pubsub.yaml"
+    LocalPath = "../pubsub.yaml"
 });
 
 builder.AddExecutable("dapr", "placement", $"{profile}\\.dapr\\bin", "-port", "6050");
