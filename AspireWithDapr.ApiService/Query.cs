@@ -1,14 +1,15 @@
 ﻿using AspireWithDapr.Shared;
+using Dapr.Actors;
 using Dapr.Actors.Client;
 
-namespace AspireWithDapr.ApiService
+namespace AspireWithDapr.ApiService;
+
+public class Query
 {
-    public class Query
+    public async Task<IEnumerable<WeatherForecast>> GetWeatherForecastsAsync(string city, IActorProxyFactory actorProxyFactory)
     {
-        public async Task<IEnumerable<WeatherForecast>> GetWeatherForecastsAsync(IActorProxyFactory actorProxyFactory)
-        {
-            var weatherActor = actorProxyFactory.CreateActorProxy<IWeatherActor>(new Dapr.Actors.ActorId("1"), nameof(WeatherActor));
-            return await weatherActor.GetWeatherForecasts();
-        }
+        var weatherActor = actorProxyFactory.CreateActorProxy<IWeatherActor>(
+            new ActorId(city), nameof(WeatherActor));
+        return await weatherActor.GetWeatherForecasts();
     }
 }

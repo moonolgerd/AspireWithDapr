@@ -1,13 +1,14 @@
 ﻿using AspireWithDapr.Shared;
 using Dapr.Actors;
 using Dapr.Actors.Runtime;
+using HotChocolate.Subscriptions;
 
 namespace AspireWithDapr.ApiService;
 
 /// <summary>
 /// Represents an actor that provides weather forecasts.
 /// </summary>
-public class WeatherActor(ActorHost host) : Actor(host), IWeatherActor
+public class WeatherActor(ActorHost host, ITopicEventSender topicEventSender) : Actor(host), IWeatherActor
 {
     /// <summary>
     /// Gets the weather forecasts.
@@ -34,6 +35,8 @@ public class WeatherActor(ActorHost host) : Actor(host), IWeatherActor
         list.Add(forecast);
 
         await StateManager.SetStateAsync(Id.GetId(), list.ToArray());
+
+        await topicEventSender.SendAsync($"WeatherForecast:{forecast.City}", forecast);
     }
 }
 
