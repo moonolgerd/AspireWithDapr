@@ -7,7 +7,7 @@ var daprFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolde
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var cache = builder.AddRedis("cache", "redis/redis-stack", 6379);
+var cache = builder.AddRedis("Redis", "redis/redis-stack", 6379);
 
 var store = builder.AddDaprStateStore("statestore", new DaprComponentOptions
 {
@@ -26,6 +26,7 @@ builder.AddExecutable("dashboard", "dapr", daprFolder, "dashboard", "-p", "9999"
 
 var apiService = builder.AddProject<Projects.AspireWithDapr_ApiService>("apiservice")
     .WithReplicas(3)
+    .WithReference(cache)
     .WithReference(store)
     .WithDaprSidecar("api");
 
