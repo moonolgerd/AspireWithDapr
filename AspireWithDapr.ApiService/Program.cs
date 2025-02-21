@@ -24,7 +24,8 @@ builder.Services
     .AddGraphQLServer()
     .AddQueryType<Query>()
     .AddSubscriptionType<Subscription>()
-    .AddRedisSubscriptions();
+    .AddRedisSubscriptions()
+    .AddInstrumentation(); 
 
 var app = builder.Build();
 
