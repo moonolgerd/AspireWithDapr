@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.build.props" />
+    <File Path="pubsub.yaml" />
+    <File Path="README.md" />
+    <File Path="statestore.yaml" />
+  </Folder>
+  <Project Path="AspireWithDapr.ApiService/AspireWithDapr.ApiService.csproj" />
+  <Project Path="AspireWithDapr.AppHost/AspireWithDapr.AppHost.csproj" />
+  <Project Path="AspireWithDapr.Publisher/AspireWithDapr.Publisher.csproj" />
+  <Project Path="AspireWithDapr.ServiceDefaults/AspireWithDapr.ServiceDefaults.csproj" />
+  <Project Path="AspireWithDapr.Shared/AspireWithDapr.Shared.csproj" />
+  <Project Path="AspireWithDapr.Web/AspireWithDapr.Web.csproj" />
+</Solution>
