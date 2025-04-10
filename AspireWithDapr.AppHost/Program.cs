@@ -1,6 +1,5 @@
-using Aspire.Hosting.Dapr;
 using AspireWithDapr.AppHost;
-using Microsoft.Extensions.Configuration;
+using CommunityToolkit.Aspire.Hosting.Dapr;
 using Microsoft.Extensions.DependencyInjection;
 
 var daprFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".dapr", "bin");
