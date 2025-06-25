@@ -92,6 +92,15 @@ public class DaprActorAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         description: "Actor class implementations should implement an interface that inherits from IActor for proper Actor pattern implementation.");
 
+    public static readonly DiagnosticDescriptor TypeMissingParameterlessConstructorOrDataContract = new(
+        "DAPR010",
+        "All types must either expose a public parameterless constructor or be decorated with the DataContractAttribute attribute",
+        "Type '{0}' must either have a public parameterless constructor or be decorated with [DataContract] attribute for proper serialization",
+        "Serialization",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "All types used in Actor methods must either expose a public parameterless constructor or be decorated with the DataContractAttribute attribute for reliable serialization.");
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         ImmutableArray.Create(
             ActorInterfaceMissingIActor,
@@ -102,7 +111,8 @@ public class DaprActorAnalyzer : DiagnosticAnalyzer
             ActorMethodReturnTypeNeedsValidation,
             CollectionTypeInActorNeedsElementValidation,
             RecordTypeNeedsDataContractAttributes,
-            ActorClassMissingInterface
+            ActorClassMissingInterface,
+            TypeMissingParameterlessConstructorOrDataContract
         );
 
     public override void Initialize(AnalysisContext context)
@@ -327,27 +337,39 @@ public class DaprActorAnalyzer : DiagnosticAnalyzer
 
         // Check if it's a complex type that needs attributes
         if (type is INamedTypeSymbol namedType &&
-            (namedType.TypeKind == TypeKind.Class || namedType.TypeKind == TypeKind.Struct) &&
-            !HasProperSerializationAttributes(namedType))
+            (namedType.TypeKind == TypeKind.Class || namedType.TypeKind == TypeKind.Struct))
         {
-            if (isParameter)
+            // DAPR010: Check if type has parameterless constructor or DataContract attribute
+            if (!HasParameterlessConstructorOrDataContract(namedType))
             {
                 var diagnostic = Diagnostic.Create(
-                    ActorMethodParameterNeedsValidation,
+                    TypeMissingParameterlessConstructorOrDataContract,
                     location,
-                    parameterName,
-                    type.Name,
-                    methodName);
+                    namedType.Name);
                 context.ReportDiagnostic(diagnostic);
             }
-            else
+
+            if (!HasProperSerializationAttributes(namedType))
             {
-                var diagnostic = Diagnostic.Create(
-                    ActorMethodReturnTypeNeedsValidation,
-                    location,
-                    type.Name,
-                    methodName);
-                context.ReportDiagnostic(diagnostic);
+                if (isParameter)
+                {
+                    var diagnostic = Diagnostic.Create(
+                        ActorMethodParameterNeedsValidation,
+                        location,
+                        parameterName,
+                        type.Name,
+                        methodName);
+                    context.ReportDiagnostic(diagnostic);
+                }
+                else
+                {
+                    var diagnostic = Diagnostic.Create(
+                        ActorMethodReturnTypeNeedsValidation,
+                        location,
+                        type.Name,
+                        methodName);
+                    context.ReportDiagnostic(diagnostic);
+                }
             }
         }
     }
@@ -498,5 +520,28 @@ public class DaprActorAnalyzer : DiagnosticAnalyzer
     private static bool HasDataMemberAttribute(IPropertySymbol property)
     {
         return HasAttribute(property, "DataMemberAttribute", "DataMember");
+    }
+
+    private static bool HasParameterlessConstructorOrDataContract(INamedTypeSymbol type)
+    {
+        // Check if type has DataContract attribute
+        if (HasAttribute(type, "DataContractAttribute", "DataContract"))
+        {
+            return true;
+        }
+
+        // Check if type has a public parameterless constructor
+        var constructors = type.Constructors;
+
+        // If no constructors are explicitly defined, there's an implicit parameterless constructor for classes
+        if (!constructors.Any() && type.TypeKind == TypeKind.Class)
+        {
+            return true;
+        }
+
+        // Check for explicitly defined public parameterless constructor
+        return constructors.Any(c =>
+            c.DeclaredAccessibility == Accessibility.Public &&
+            c.Parameters.Length == 0);
     }
 }

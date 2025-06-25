@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -6,12 +6,23 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <PackageId>Dapr.Analyzers</PackageId>
-    <PackageVersion>1.0.0</PackageVersion>
-    <PackageDescription>Analyzers for validating Dapr Actor implementations</PackageDescription>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <DevelopmentDependency>true</DevelopmentDependency>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Dapr.Analyzers</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Authors>moonolgerd</Authors>
+    <PackageDescription>Roslyn analyzers for validating Dapr Actor implementations and ensuring best practices</PackageDescription>
+    <PackageProjectUrl>https://github.com/moonolgerd/AspireWithDapr</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/moonolgerd/AspireWithDapr</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>Initial release of Dapr analyzers for validating Actor implementations</PackageReleaseNotes>
+    <PackageTags>dapr, analyzers, roslyn, actors, microservices</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,8 +34,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="tools\install.ps1" Pack="true" PackagePath="tools\install.ps1" />
-    <None Include="tools\uninstall.ps1" Pack="true" PackagePath="tools\uninstall.ps1" />
+    <None Include="tools\*.ps1" Pack="true" PackagePath="tools" />
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 
 </Project>

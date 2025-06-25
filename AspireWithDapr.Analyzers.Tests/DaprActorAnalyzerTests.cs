@@ -432,4 +432,135 @@ namespace Test
 
         Assert.IsNull(dapr009, "Should not report DAPR009 for Actor class with proper IActor interface");
     }
+
+    [TestMethod]
+    public async Task TypeWithoutParameterlessConstructorOrDataContract_ShouldReportDAPR010()
+    {
+        var code = @"
+using Dapr.Actors;
+using Dapr.Actors.Runtime;
+using System.Threading.Tasks;
+
+namespace Test
+{
+    public class TypeWithoutParameterlessConstructor
+    {
+        public TypeWithoutParameterlessConstructor(string value)
+        {
+            Value = value;
+        }
+        
+        public string Value { get; set; }
+    }
+
+    public interface ITestActor : IActor
+    {
+        Task<TypeWithoutParameterlessConstructor> GetDataAsync();
+    }
+
+    public class TestActor : Actor, ITestActor
+    {
+        public TestActor(ActorHost host) : base(host) { }
+        
+        public Task<TypeWithoutParameterlessConstructor> GetDataAsync()
+        {
+            return Task.FromResult(new TypeWithoutParameterlessConstructor(""test""));
+        }
+    }
+}";
+        var diagnostics = await GetDiagnosticsAsync(code);
+        var dapr010 = diagnostics.FirstOrDefault(d => d.Id == "DAPR010");
+
+        Assert.IsNotNull(dapr010, "Expected DAPR010 diagnostic for type without parameterless constructor or DataContract");
+        Assert.IsTrue(dapr010.GetMessage().Contains("TypeWithoutParameterlessConstructor"));
+    }
+
+    [TestMethod]
+    public async Task TypeWithDataContract_ShouldNotReportDAPR010()
+    {
+        var code = @"
+using Dapr.Actors;
+using Dapr.Actors.Runtime;
+using System.Runtime.Serialization;
+using System.Threading.Tasks;
+
+namespace Test
+{
+    [DataContract]
+    public class TypeWithDataContract
+    {
+        public TypeWithDataContract(string value)
+        {
+            Value = value;
+        }
+        
+        [DataMember]
+        public string Value { get; set; }
+    }
+
+    public interface ITestActor : IActor
+    {
+        Task<TypeWithDataContract> GetDataAsync();
+    }
+
+    public class TestActor : Actor, ITestActor
+    {
+        public TestActor(ActorHost host) : base(host) { }
+        
+        public Task<TypeWithDataContract> GetDataAsync()
+        {
+            return Task.FromResult(new TypeWithDataContract(""test""));
+        }
+    }
+}";
+        var diagnostics = await GetDiagnosticsAsync(code);
+        var dapr010 = diagnostics.FirstOrDefault(d => d.Id == "DAPR010");
+
+        Assert.IsNull(dapr010, "Should not report DAPR010 for type with DataContract attribute");
+    }
+
+    [TestMethod]
+    public async Task TypeWithParameterlessConstructor_ShouldNotReportDAPR010()
+    {
+        var code = @"
+using Dapr.Actors;
+using Dapr.Actors.Runtime;
+using System.Threading.Tasks;
+
+namespace Test
+{
+    public class TypeWithParameterlessConstructor
+    {
+        public TypeWithParameterlessConstructor()
+        {
+        }
+        
+        public TypeWithParameterlessConstructor(string value)
+        {
+            Value = value;
+        }
+        
+        public string Value { get; set; }
+    }
+
+    public interface ITestActor : IActor
+    {
+        Task<TypeWithParameterlessConstructor> GetDataAsync();
+    }
+
+    public class TestActor : Actor, ITestActor
+    {
+        public TestActor(ActorHost host) : base(host) { }
+        
+        public Task<TypeWithParameterlessConstructor> GetDataAsync()
+        {
+            return Task.FromResult(new TypeWithParameterlessConstructor());
+        }
+    }
+}";
+        var diagnostics = await GetDiagnosticsAsync(code);
+        var dapr010 = diagnostics.FirstOrDefault(d => d.Id == "DAPR010");
+
+        Assert.IsNull(dapr010, "Should not report DAPR010 for type with parameterless constructor");
+    }
 }

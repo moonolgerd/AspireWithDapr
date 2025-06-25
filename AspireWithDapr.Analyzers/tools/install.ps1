@@ -2,11 +2,16 @@ param($installPath, $toolsPath, $package, $project)
 
 Write-Host "Installing Dapr.Analyzers..."
 
-# Add analyzer reference
-$analyzersPath = Join-Path $toolsPath "..\analyzers\dotnet\cs\Dapr.Analyzers.dll"
+# Add analyzer references
+$analyzersPath = Join-Path $toolsPath "..\analyzers\dotnet\cs"
 if (Test-Path $analyzersPath) {
-    $project.Object.References.Add($analyzersPath)
-    Write-Host "Analyzer installed successfully."
+    foreach ($analyzerFilePath in Get-ChildItem -Path "$analyzersPath\*.dll" -Exclude *.resources.dll) {
+        if ($project.Object.AnalyzerReferences) {
+            $project.Object.AnalyzerReferences.Add($analyzerFilePath.FullName)
+            Write-Host "Added analyzer: $($analyzerFilePath.Name)"
+        }
+    }
+    Write-Host "Dapr.Analyzers installed successfully."
 } else {
-    Write-Warning "Analyzer assembly not found at: $analyzersPath"
+    Write-Warning "Analyzers directory not found at: $analyzersPath"
 }
