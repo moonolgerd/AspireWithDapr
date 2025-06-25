@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AspireWithDapr.ServiceDefaults\AspireWithDapr.ServiceDefaults.csproj" />
     <ProjectReference Include="..\AspireWithDapr.Shared\AspireWithDapr.Shared.csproj" />
+    <ProjectReference Include="..\AspireWithDapr.Analyzers\Dapr.Analyzers.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
   </ItemGroup>
 
 </Project>

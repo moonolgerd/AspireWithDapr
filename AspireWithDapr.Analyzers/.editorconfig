@@ -1,0 +1,16 @@
+# AspireWithDapr.Analyzers Configuration
+
+root = true
+
+[*.cs]
+# Dapr Actor Analyzer Rules
+dotnet_diagnostic.DAPR001.severity = warning
+dotnet_diagnostic.DAPR002.severity = warning
+dotnet_diagnostic.DAPR003.severity = error
+dotnet_diagnostic.DAPR004.severity = error
+dotnet_diagnostic.DAPR005.severity = warning
+dotnet_diagnostic.DAPR006.severity = suggestion
+dotnet_diagnostic.DAPR007.severity = warning
+
+# Enable analyzer by default
+dotnet_analyzer_diagnostic.category-serialization.severity = warning

@@ -5,6 +5,8 @@
     <File Path="README.md" />
     <File Path="statestore.yaml" />
   </Folder>
+  <Project Path="AspireWithDapr.Analyzers.Tests/Dapr.Analyzers.Tests.csproj" />
+  <Project Path="AspireWithDapr.Analyzers/Dapr.Analyzers.csproj" />
   <Project Path="AspireWithDapr.ApiService/AspireWithDapr.ApiService.csproj" />
   <Project Path="AspireWithDapr.AppHost/AspireWithDapr.AppHost.csproj" />
   <Project Path="AspireWithDapr.Publisher/AspireWithDapr.Publisher.csproj" />
