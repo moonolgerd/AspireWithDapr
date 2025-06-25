@@ -1,4 +1,4 @@
-# Release 1.0
+## Release 1.0
 
 ### New Rules
 
@@ -12,3 +12,4 @@ DAPR005 | Serialization | Warning | Actor method parameter needs proper serializ
 DAPR006 | Serialization | Warning | Actor method return type needs proper serialization attributes
 DAPR007 | Serialization | Warning | Collection types in Actor methods need element type validation
 DAPR008 | Serialization | Warning | Record types should use DataContract and DataMember attributes for Actor serialization
+DAPR009 | Serialization | Error | Actor class implementation should implement an interface that inherits from IActor

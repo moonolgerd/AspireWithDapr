@@ -1,11 +1,8 @@
-using AspireWithDapr.Analyzers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Dapr.Analyzers.Tests;
 
@@ -384,5 +381,55 @@ namespace Test
 
         Assert.IsNotNull(dapr008, "Expected DAPR008 diagnostic for record used in Actor method without proper attributes");
         Assert.IsTrue(dapr008.GetMessage().Contains("UserData"));
+    }
+
+    [TestMethod]
+    public async Task ActorClass_WithoutIActorInterface_ShouldReportDAPR009()
+    {
+        var code = @"
+using Dapr.Actors;
+using Dapr.Actors.Runtime;
+
+namespace Test
+{
+    public class TestActor : Actor
+    {
+        public TestActor(ActorHost host) : base(host) { }
+        
+        public void DoSomething() { }
+    }
+}";
+        var diagnostics = await GetDiagnosticsAsync(code);
+        var dapr009 = diagnostics.FirstOrDefault(d => d.Id == "DAPR009");
+
+        Assert.IsNotNull(dapr009, "Expected DAPR009 diagnostic for Actor class without IActor interface");
+        Assert.IsTrue(dapr009.GetMessage().Contains("TestActor"));
+    }
+
+    [TestMethod]
+    public async Task ActorClass_WithIActorInterface_ShouldNotReportDAPR009()
+    {
+        var code = @"
+using Dapr.Actors;
+using Dapr.Actors.Runtime;
+
+namespace Test
+{
+    public interface ITestActor : IActor
+    {
+        void DoSomething();
+    }
+
+    public class TestActor : Actor, ITestActor
+    {
+        public TestActor(ActorHost host) : base(host) { }
+        
+        public void DoSomething() { }
+    }
+}";
+        var diagnostics = await GetDiagnosticsAsync(code);
+        var dapr009 = diagnostics.FirstOrDefault(d => d.Id == "DAPR009");
+
+        Assert.IsNull(dapr009, "Should not report DAPR009 for Actor class with proper IActor interface");
     }
 }

@@ -83,6 +83,15 @@ public class DaprActorAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         description: "Record types used in Actor methods should have [DataContract] attribute and [DataMember] attributes on all properties for reliable serialization.");
 
+    public static readonly DiagnosticDescriptor ActorClassMissingInterface = new(
+        "DAPR009",
+        "Actor class implementation should implement an interface that inherits from IActor",
+        "Actor class '{0}' should implement an interface that inherits from IActor",
+        "Serialization",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Actor class implementations should implement an interface that inherits from IActor for proper Actor pattern implementation.");
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         ImmutableArray.Create(
             ActorInterfaceMissingIActor,
@@ -92,7 +101,8 @@ public class DaprActorAnalyzer : DiagnosticAnalyzer
             ActorMethodParameterNeedsValidation,
             ActorMethodReturnTypeNeedsValidation,
             CollectionTypeInActorNeedsElementValidation,
-            RecordTypeNeedsDataContractAttributes
+            RecordTypeNeedsDataContractAttributes,
+            ActorClassMissingInterface
         );
 
     public override void Initialize(AnalysisContext context)
@@ -120,6 +130,9 @@ public class DaprActorAnalyzer : DiagnosticAnalyzer
 
         // Check implemented interfaces
         CheckActorInterfaces(context, classDeclaration, classSymbol);
+
+        // DAPR009: Check if Actor class implements at least one interface that inherits from IActor
+        CheckActorClassImplementsIActorInterface(context, classDeclaration, classSymbol);
 
         // Check method parameters and return types
         CheckActorMethodTypes(context, classSymbol);
@@ -228,6 +241,21 @@ public class DaprActorAnalyzer : DiagnosticAnalyzer
                     interfaceType.Name);
                 context.ReportDiagnostic(diagnostic);
             }
+        }
+    }
+
+    private static void CheckActorClassImplementsIActorInterface(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax classDeclaration, INamedTypeSymbol classSymbol)
+    {
+        // Check if the Actor class implements at least one interface that inherits from IActor
+        bool implementsIActorInterface = classSymbol.Interfaces.Any(interfaceType => InheritsFromIActor(interfaceType));
+
+        if (!implementsIActorInterface)
+        {
+            var diagnostic = Diagnostic.Create(
+                ActorClassMissingInterface,
+                classDeclaration.Identifier.GetLocation(),
+                classSymbol.Name);
+            context.ReportDiagnostic(diagnostic);
         }
     }
 
