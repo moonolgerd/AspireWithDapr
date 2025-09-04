@@ -1,9 +1,10 @@
 ﻿@page "/weather"
 @using AspireWithDapr.Shared
+@using Microsoft.Extensions.Logging
 @* @attribute [StreamRendering(true)]
 @attribute [OutputCache(Duration = 5)] *@
 @rendermode InteractiveServer
-
+@inject ILogger<Weather> Logger
 @inject WeatherApiClient WeatherApi
 
 <PageTitle>Weather</PageTitle>
@@ -55,6 +56,7 @@ else
 
     private async Task Foo()
     {
+        Logger.LogInformation("Getting weather forecast for {city}", selectedCity);
         forecasts = await WeatherApi.GetWeatherAsync(selectedCity);
     }
 }

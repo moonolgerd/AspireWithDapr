@@ -3,7 +3,7 @@ using Dapr.Client;
 
 namespace AspireWithDapr.Publisher;
 
-public class PublisherHostedService(DaprClient daprClient) : BackgroundService
+public class PublisherHostedService(DaprClient daprClient, ILogger<PublisherHostedService> logger) : BackgroundService
 {
     private static readonly string[] Summary = ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"];
 
@@ -20,7 +20,7 @@ public class PublisherHostedService(DaprClient daprClient) : BackgroundService
                 City = SharedCollections.Cities[random.Next(0, SharedCollections.Cities.Count)]
             };
             await daprClient.PublishEventAsync(SharedConstants.PubsubName, SharedConstants.TopicName, weatherForecast, stoppingToken);
-            Console.WriteLine("Published data: " + weatherForecast);
+            logger.LogInformation("Published data: {weatherForecast}", weatherForecast);
             await Task.Delay(1000, stoppingToken);
         }
     }

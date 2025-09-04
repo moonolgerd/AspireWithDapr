@@ -6,7 +6,7 @@ var daprFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolde
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var seq = builder.AddSeq("seq")
+var seq = builder.AddSeq("seq", 5341)
     .ExcludeFromManifest()
     .WithLifetime(ContainerLifetime.Persistent)
     .WithEnvironment("ACCEPT_EULA", "Y");
@@ -30,23 +30,29 @@ builder.AddExecutable("dapr", "placement", daprFolder, "-port", "6050")
 builder.AddExecutable("dashboard", "dapr", daprFolder, "dashboard", "-p", "9999")
     .WithHttpEndpoint(9999, targetPort: 9999, isProxied: false);
 
+builder.AddExecutable("scheduler", "scheduler", daprFolder, "--port", "6060", "--metrics-port", "9092", "--healthz-port", "8089");
+
 var apiService = builder.AddProject<Projects.AspireWithDapr_ApiService>("apiservice")
     .WithReplicas(3)
     .WithReference(cache)
     .WithReference(store)
     .WithReference(seq)
-    .WaitFor(seq)
-    .WithDaprSidecar("api");
+    .WithDaprSidecar("api")
+    .WaitFor(seq);
 
 builder.AddProject<Projects.AspireWithDapr_Web>("webfrontend")
     .WithDaprSidecar("web")
     .WithExternalHttpEndpoints()
     .WithReference(cache)
-    .WithReference(apiService);
+    .WithReference(apiService)
+    .WithReference(seq)
+    .WaitFor(seq);
 
 builder.AddProject<Projects.AspireWithDapr_Publisher>("publisher")
-    .WithDaprSidecar()
+    .WithDaprSidecar("publisher")
     .WithExternalHttpEndpoints()
-    .WithReference(pubsub);
+    .WithReference(pubsub)
+    .WithReference(seq)
+    .WaitFor(seq);
 
 builder.Build().Run();
