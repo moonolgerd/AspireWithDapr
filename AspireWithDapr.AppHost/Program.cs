@@ -6,7 +6,14 @@ var daprFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolde
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var cache = builder.AddRedis("Redis", "redis/redis-stack", 6379);
+var seq = builder.AddSeq("seq")
+    .ExcludeFromManifest()
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithEnvironment("ACCEPT_EULA", "Y");
+
+var redisPassword = builder.AddParameter("redis-password", "mypassword");
+var cache = builder.AddRedis("Redis", port: 6379, redisPassword)
+    .WithRedisInsight();
 
 var store = builder.AddDaprStateStore("statestore", new DaprComponentOptions
 {
@@ -27,6 +34,8 @@ var apiService = builder.AddProject<Projects.AspireWithDapr_ApiService>("apiserv
     .WithReplicas(3)
     .WithReference(cache)
     .WithReference(store)
+    .WithReference(seq)
+    .WaitFor(seq)
     .WithDaprSidecar("api");
 
 builder.AddProject<Projects.AspireWithDapr_Web>("webfrontend")

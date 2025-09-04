@@ -10,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add service defaults & Aspire components.
 builder.AddServiceDefaults();
 
+builder.AddSeqEndpoint(connectionName: "seq");
+
 builder.AddRedisClient("Redis");
 
 // Add services to the container.
