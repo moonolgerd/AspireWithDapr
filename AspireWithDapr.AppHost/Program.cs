@@ -32,6 +32,10 @@ builder.AddExecutable("dashboard", "dapr", daprFolder, "dashboard", "-p", "9999"
 
 builder.AddExecutable("scheduler", "scheduler", daprFolder, "--port", "6060", "--metrics-port", "9092", "--healthz-port", "8089");
 
+var localFoundry = builder.AddAzureAIFoundry("foundry")
+    .RunAsFoundryLocal()
+    .AddDeployment("chat", "phi-3.5-mini", "1", "Microsoft");
+
 var apiService = builder.AddProject<Projects.AspireWithDapr_ApiService>("apiservice")
     .WithReplicas(3)
     .WithReference(cache)
@@ -46,6 +50,7 @@ builder.AddProject<Projects.AspireWithDapr_Web>("webfrontend")
     .WithReference(cache)
     .WithReference(apiService)
     .WithReference(seq)
+    .WithReference(localFoundry)
     .WaitFor(seq);
 
 builder.AddProject<Projects.AspireWithDapr_Publisher>("publisher")

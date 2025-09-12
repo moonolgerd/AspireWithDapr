@@ -1,5 +1,6 @@
 using AspireWithDapr.Web;
 using AspireWithDapr.Web.Components;
+using AspireWithDapr.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,9 @@ builder.AddRedisOutputCache("cache");
 
 builder.AddSeqEndpoint(connectionName: "seq");
 
+builder.AddOpenAIClient("chat")
+       .AddChatClient();
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -16,6 +20,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddDaprClient();
 
 builder.Services.AddSingleton<WeatherApiClient>();
+builder.Services.AddScoped<ChatService>();
 
 var app = builder.Build();
 

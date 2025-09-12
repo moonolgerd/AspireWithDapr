@@ -1,7 +1,230 @@
 ﻿@page "/"
+@using AspireWithDapr.Web.Services
+@inject ChatService ChatService
+@rendermode InteractiveServer
 
-<PageTitle>Home</PageTitle>
+<PageTitle>AI Chat with phi-3.5-mini</PageTitle>
 
-<h1>Hello, world!</h1>
+<link href="~/css/chat.css" rel="stylesheet" />
 
-Welcome to your new app.
+<div class="container-fluid py-3">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1 class="display-5 fw-bold text-primary">🤖 AI Chat Assistant</h1>
+            <p class="lead text-muted">Powered by phi-3.5-mini via Azure AI Foundry & .NET Aspire</p>
+        </div>
+    </div>
+    
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10 col-xl-8">
+            <div class="card shadow-sm">
+                <div class="card-body p-0">
+                    <!-- Chat Messages Area -->
+                    <div class="chat-container p-4" style="height: 500px; overflow-y: auto; background: linear-gradient(to bottom, #f8f9fa, #ffffff);">
+                        @if (messages.Count == 0)
+                        {
+                            <div class="welcome-message">
+                                <i class="fas fa-robot"></i>
+                                <h5>Welcome to AI Chat!</h5>
+                                <p class="mb-0">Start a conversation with your AI assistant powered by phi-3.5-mini</p>
+                            </div>
+                        }
+                        else
+                        {
+                            @foreach (var message in messages)
+                            {
+                                <div class="message-bubble @(message.IsUser ? "user-message" : "ai-message")">
+                                    <div class="d-flex align-items-start @(message.IsUser ? "flex-row-reverse" : "")">
+                                        <div class="message-avatar @(message.IsUser ? "ms-2" : "me-2")">
+                                            @if (message.IsUser)
+                                            {
+                                                <span class="badge bg-primary rounded-circle">👤</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-success rounded-circle">🤖</span>
+                                            }
+                                        </div>
+                                        <div class="message-content">
+                                            <div class="message-text p-3 rounded-3 shadow-sm">
+                                                @message.Text
+                                            </div>
+                                            <small class="text-muted d-block mt-1 @(message.IsUser ? "text-end" : "text-start")">
+                                                @message.Timestamp.ToString("HH:mm:ss")
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            
+                            @if (isLoading)
+                            {
+                                <div class="message-bubble ai-message">
+                                    <div class="d-flex align-items-start">
+                                        <div class="message-avatar me-2">
+                                            <span class="badge bg-success rounded-circle">🤖</span>
+                                        </div>
+                                        <div class="message-content">
+                                            <div class="message-text p-3 rounded-3 shadow-sm bg-white border">
+                                                <div class="typing-indicator">
+                                                    <span></span>
+                                                    <span></span>
+                                                    <span></span>
+                                                    <span class="ms-2 text-muted">AI is thinking...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                    
+                    <!-- Input Area -->
+                    <div class="chat-input-area p-4 border-top">
+                        <div class="input-group">
+                            <input @bind="currentMessage" 
+                                   @onkeypress="HandleKeyPress" 
+                                   class="form-control form-control-lg" 
+                                   placeholder="Type your message here... (Press Enter to send)" 
+                                   disabled="@isLoading" 
+                                   style="border-radius: 25px 0 0 25px;" />
+                            <button class="btn btn-primary btn-lg px-4" 
+                                    @onclick="SendMessage" 
+                                    disabled="@(isLoading || string.IsNullOrWhiteSpace(currentMessage))"
+                                    style="border-radius: 0 25px 25px 0;">
+                                @if (isLoading)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-paper-plane me-1"></i>
+                                }
+                                Send
+                            </button>
+                        </div>
+                        @if (messages.Count > 0)
+                        {
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    @messages.Count message(s) in conversation
+                                </small>
+                                <button class="btn btn-outline-secondary btn-sm" @onclick="ClearChat">
+                                    <i class="fas fa-trash me-1"></i> Clear Chat
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string currentMessage = "";
+    private bool isLoading = false;
+    private List<ChatMessage> messages = new();
+
+    private class ChatMessage
+    {
+        public string Text { get; set; } = "";
+        public bool IsUser { get; set; }
+        public DateTime Timestamp { get; set; } = DateTime.Now;
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(currentMessage) || isLoading)
+            return;
+
+        var userMessage = currentMessage.Trim();
+        currentMessage = "";
+        isLoading = true;
+
+        // Add user message
+        messages.Add(new ChatMessage
+        {
+            Text = userMessage,
+            IsUser = true,
+            Timestamp = DateTime.Now
+        });
+
+        await InvokeAsync(StateHasChanged);
+        await ScrollToBottom();
+
+        try
+        {
+            // Get AI response
+            var aiResponse = await ChatService.SendMessageAsync(userMessage);
+            
+            // Add AI response
+            messages.Add(new ChatMessage
+            {
+                Text = aiResponse,
+                IsUser = false,
+                Timestamp = DateTime.Now
+            });
+        }
+        catch (Exception ex)
+        {
+            // Add error message
+            messages.Add(new ChatMessage
+            {
+                Text = $"Sorry, I encountered an error while processing your request. Please make sure the AI Foundry service is running.\n\nError: {ex.Message}",
+                IsUser = false,
+                Timestamp = DateTime.Now
+            });
+        }
+        finally
+        {
+            isLoading = false;
+            await InvokeAsync(StateHasChanged);
+            await ScrollToBottom();
+        }
+    }
+
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !e.ShiftKey)
+        {
+            await SendMessage();
+        }
+    }
+
+    private async Task ClearChat()
+    {
+        messages.Clear();
+        // Add welcome message back
+        messages.Add(new ChatMessage
+        {
+            Text = "Hello! I'm your AI assistant powered by the phi-3.5-mini model. How can I help you today?",
+            IsUser = false,
+            Timestamp = DateTime.Now
+        });
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ScrollToBottom()
+    {
+        await Task.Delay(50); // Small delay to ensure DOM is updated
+        await InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Add a welcome message
+            messages.Add(new ChatMessage
+            {
+                Text = "Hello! I'm your AI assistant powered by the phi-3.5-mini model running locally via Azure AI Foundry. How can I help you today?",
+                IsUser = false,
+                Timestamp = DateTime.Now
+            });
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+}
