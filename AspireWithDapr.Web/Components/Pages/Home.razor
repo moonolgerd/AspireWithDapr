@@ -3,15 +3,20 @@
 @inject ChatService ChatService
 @rendermode InteractiveServer
 
-<PageTitle>AI Chat with phi-3.5-mini</PageTitle>
+<PageTitle>AI Chat with phi-3.5-mini & Redis MCP</PageTitle>
 
 <link href="~/css/chat.css" rel="stylesheet" />
 
 <div class="container-fluid py-3">
     <div class="row mb-4">
         <div class="col-12 text-center">
-            <h1 class="display-5 fw-bold text-primary">🤖 AI Chat Assistant</h1>
+            <h1 class="display-5 fw-bold text-primary">🤖 AI Chat Assistant with Redis MCP</h1>
             <p class="lead text-muted">Powered by phi-3.5-mini via Azure AI Foundry & .NET Aspire</p>
+            <div class="alert alert-info">
+                <i class="fas fa-database me-2"></i>
+                <strong>New:</strong> This assistant can now interact with Redis data via Model Context Protocol (MCP)!
+                Try asking about Redis keys, cache data, or stored values.
+            </div>
         </div>
     </div>
     
@@ -25,8 +30,11 @@
                         {
                             <div class="welcome-message">
                                 <i class="fas fa-robot"></i>
-                                <h5>Welcome to AI Chat!</h5>
-                                <p class="mb-0">Start a conversation with your AI assistant powered by phi-3.5-mini</p>
+                                <h5>Welcome to AI Chat with Redis MCP!</h5>
+                                <p class="mb-2">Start a conversation with your AI assistant powered by phi-3.5-mini</p>
+                                <small class="text-muted">
+                                    <strong>Redis Commands Available:</strong> GET, SET, KEYS, HGET, HGETALL, DEL, EXISTS, TTL
+                                </small>
                             </div>
                         }
                         else
@@ -86,7 +94,7 @@
                             <input @bind="currentMessage" 
                                    @onkeypress="HandleKeyPress" 
                                    class="form-control form-control-lg" 
-                                   placeholder="Type your message here... (Press Enter to send)" 
+                                   placeholder="Ask me anything, including Redis queries! (Press Enter to send)" 
                                    disabled="@isLoading" 
                                    style="border-radius: 25px 0 0 25px;" />
                             <button class="btn btn-primary btn-lg px-4" 
@@ -109,7 +117,7 @@
                             <div class="d-flex justify-content-between align-items-center mt-3">
                                 <small class="text-muted">
                                     <i class="fas fa-info-circle me-1"></i>
-                                    @messages.Count message(s) in conversation
+                                    @messages.Count message(s) • Redis MCP Tools Available
                                 </small>
                                 <button class="btn btn-outline-secondary btn-sm" @onclick="ClearChat">
                                     <i class="fas fa-trash me-1"></i> Clear Chat
@@ -173,7 +181,7 @@
             // Add error message
             messages.Add(new ChatMessage
             {
-                Text = $"Sorry, I encountered an error while processing your request. Please make sure the AI Foundry service is running.\n\nError: {ex.Message}",
+                Text = $"Sorry, I encountered an error while processing your request. Please make sure the AI Foundry service and Redis are running.\n\nError: {ex.Message}",
                 IsUser = false,
                 Timestamp = DateTime.Now
             });
@@ -200,7 +208,7 @@
         // Add welcome message back
         messages.Add(new ChatMessage
         {
-            Text = "Hello! I'm your AI assistant powered by the phi-3.5-mini model. How can I help you today?",
+            Text = "Hello! I'm your AI assistant powered by the phi-3.5-mini model with Redis MCP integration. I can help you with general questions and also interact with Redis data. Try asking me to check Redis keys, get cached values, or perform Redis operations!",
             IsUser = false,
             Timestamp = DateTime.Now
         });
@@ -220,7 +228,7 @@
             // Add a welcome message
             messages.Add(new ChatMessage
             {
-                Text = "Hello! I'm your AI assistant powered by the phi-3.5-mini model running locally via Azure AI Foundry. How can I help you today?",
+                Text = "Hello! I'm your AI assistant powered by the phi-3.5-mini model running locally via Azure AI Foundry. I now have Redis MCP (Model Context Protocol) integration, which means I can interact with your Redis database! You can ask me to:\n\n• Get Redis keys or values\n• Set Redis data\n• Check if keys exist\n• Query hash fields\n• And more Redis operations\n\nHow can I help you today?",
                 IsUser = false,
                 Timestamp = DateTime.Now
             });

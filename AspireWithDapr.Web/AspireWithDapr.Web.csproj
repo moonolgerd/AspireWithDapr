@@ -11,7 +11,7 @@
     <PackageReference Include="Aspire.StackExchange.Redis.OutputCaching" Version="9.4.2" />
     <PackageReference Include="Dapr.AspNetCore" Version="1.15.4" />
     <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="9.7.0-preview.1.25356.2" />
-    
+    <PackageReference Include="ModelContextProtocol" Version="0.3.0-preview.4" />
   </ItemGroup>
 
 </Project>
