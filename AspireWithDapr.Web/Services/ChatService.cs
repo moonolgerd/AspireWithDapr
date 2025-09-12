@@ -12,15 +12,14 @@ public class ChatService(IChatClient chatClient, ILogger<ChatService> logger)
         {
             var chatMessages = new List<ChatMessage>
             {
-                new(ChatRole.System, "You are a helpful AI assistant using the phi-3.5-mini model. You have access to Redis data through MCP tools. When users ask about data or caching, you can query Redis to provide accurate information."),
+                new(ChatRole.System, "You are a helpful AI assistant using the phi-4-mini model. You have access to Redis data through MCP tools. When users ask about data or caching, you can query Redis to provide accurate information."),
                 new(ChatRole.User, message)
             };
 
             var options = new ChatOptions
             {
                 Tools = [.. await GetRedisMcp()],
-                Temperature = 0.7f,
-                ToolMode = ChatToolMode.RequireAny
+                Temperature = 0.7f
             };
 
             var response = await chatClient.GetResponseAsync(chatMessages, options);
@@ -55,7 +54,7 @@ public class ChatService(IChatClient chatClient, ILogger<ChatService> logger)
     {
         var chatMessages = new List<ChatMessage>
         {
-            new(ChatRole.System, "You are a helpful AI assistant using the phi-3.5-mini model. You have access to Redis data through MCP tools."),
+            new(ChatRole.System, "You are a helpful AI assistant using the phi-4-mini model. You have access to Redis data through MCP tools."),
             new(ChatRole.User, message)
         };
 
@@ -63,8 +62,7 @@ public class ChatService(IChatClient chatClient, ILogger<ChatService> logger)
         var options = new ChatOptions
         {
             Tools = [.. await GetRedisMcp()],
-            Temperature = 0.7f,
-            ToolMode = ChatToolMode.RequireAny,
+            Temperature = 0.7f
         };
 
         await foreach (var update in chatClient.GetStreamingResponseAsync(chatMessages, options))

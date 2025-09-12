@@ -34,7 +34,7 @@ builder.AddExecutable("scheduler", "scheduler", daprFolder, "--port", "6060", "-
 
 var localFoundry = builder.AddAzureAIFoundry("foundry")
     .RunAsFoundryLocal()
-    .AddDeployment("chat", "phi-3.5-mini", "1", "Microsoft");
+    .AddDeployment("chat", "phi-4-mini", "1", "Microsoft");
 
 var apiService = builder.AddProject<Projects.AspireWithDapr_ApiService>("apiservice")
     .WithReplicas(3)
