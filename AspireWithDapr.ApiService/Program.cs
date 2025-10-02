@@ -25,6 +25,7 @@ builder.Services.AddActors(options =>
 builder.Services
     .AddGraphQLServer()
     .AddQueryType<Query>()
+    .AddMutationType<Mutation>()
     .AddSubscriptionType<Subscription>()
     .AddRedisSubscriptions()
     .AddInstrumentation(); 
