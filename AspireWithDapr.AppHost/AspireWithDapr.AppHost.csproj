@@ -1,10 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Aspire.AppHost.Sdk/13.0.0">
 
-  <Sdk Name="Aspire.AppHost.Sdk" Version="9.5.1" />
-  
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <IsAspireHost>true</IsAspireHost>
     <UserSecretsId>579f13d2-9e53-4eb7-866b-df81fd5435bc</UserSecretsId>
   </PropertyGroup>
 
@@ -15,10 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.5.1" />
-		<PackageReference Include="Aspire.Hosting.Azure.AIFoundry" Version="9.5.1-preview.1.25502.11" />
-		<PackageReference Include="Aspire.Hosting.Redis" Version="9.5.1" />
-    <PackageReference Include="Aspire.Hosting.Seq" Version="9.5.1" />
+    <PackageReference Include="Aspire.Hosting.Azure.AIFoundry" Version="13.0.0-preview.1.25560.3" />
+		<PackageReference Include="Aspire.Hosting.Redis" Version="13.0.0" />
+    <PackageReference Include="Aspire.Hosting.Seq" Version="13.0.0" />
     <PackageReference Include="CommunityToolkit.Aspire.Hosting.Dapr" Version="9.7.2" />
     <PackageReference Include="CommunityToolkit.Aspire.Hosting.Redis.Extensions" Version="9.7.2" />
   </ItemGroup>
