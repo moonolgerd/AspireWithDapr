@@ -1,0 +1,14 @@
+{
+  "schema": "schema.graphql",
+  "documents": "GraphQL/**/*.graphql",
+  "extensions": {
+    "strawberryShake": {
+      "name": "WeatherApiClient",
+      "namespace": "AspireWithDapr.Web.Generated",
+      "url": "http://api/graphql",
+      "dependencyInjection": true,
+      "entityRecords": true,
+      "strictSchemaValidation": false
+    }
+  }
+}

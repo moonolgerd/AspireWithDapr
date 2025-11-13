@@ -1,6 +1,7 @@
 using AspireWithDapr.Web;
 using AspireWithDapr.Web.Components;
 using AspireWithDapr.Web.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,8 +20,25 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddDaprClient();
 
-builder.Services.AddSingleton<WeatherApiClient>();
+// Legacy Dapr-based client (for backward compatibility)
+builder.Services.AddSingleton<AspireWithDapr.Web.WeatherApiClient>();
 builder.Services.AddScoped<ChatService>();
+
+// Add StrawberryShake GraphQL client
+// Note: "apiservice" matches the service name in AppHost, but we use "api" for Dapr app-id
+builder.Services
+    .AddWeatherApiClient()
+    .ConfigureHttpClient((sp, client) =>
+    {
+        // Aspire service discovery resolves "http://apiservice" to the actual ApiService endpoint
+        // The service name "apiservice" comes from AppHost: builder.AddProject<>("apiservice")
+        client.BaseAddress = new Uri("http://apiservice/graphql");
+    })
+    .ConfigureWebSocketClient((sp, client) =>
+    {
+        // Configure WebSocket for GraphQL subscriptions
+        client.Uri = new Uri("ws://apiservice/graphql");
+    });
 
 var app = builder.Build();
 
