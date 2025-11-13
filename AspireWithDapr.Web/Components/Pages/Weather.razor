@@ -2,17 +2,18 @@
 @using AspireWithDapr.Shared
 @using Microsoft.Extensions.Logging
 @using Microsoft.AspNetCore.Components.QuickGrid
+@using AspireWithDapr.Web.Generated
 @* @attribute [StreamRendering(true)]
 @attribute [OutputCache(Duration = 5)] *@
 @rendermode InteractiveServer
 @inject ILogger<Weather> Logger
-@inject WeatherApiClient WeatherApi
+@inject IWeatherApiClient WeatherClient
 
 <PageTitle>Weather</PageTitle>
 
 <h1>Weather</h1>
 
-<p>This component demonstrates showing data loaded from a backend API service.</p>
+<p>This component demonstrates showing data loaded from a backend API service using GraphQL (StrawberryShake).</p>
 
 <div style="display: flex; gap: 20px;">
     <div>
@@ -27,9 +28,13 @@
     </div>
 
     <div style="flex: 1;">
-        @if (forecasts == null)
+        @if (isLoading)
         {
             <p><em>Loading...</em></p>
+        }
+        else if (forecasts == null || !forecasts.Any())
+        {
+            <p><em>No data available. Select a city to load weather forecasts.</em></p>
         }
         else
         {
@@ -45,13 +50,37 @@
 
 @code {
     private string selectedCity = "";
-
-    private WeatherForecast[]? forecasts;
+    private List<IGetWeatherForecasts_WeatherForecasts>? forecasts;
+    private bool isLoading = false;
 
     private async Task SelectCity(string city)
     {
         selectedCity = city;
-        Logger.LogInformation("Getting weather forecast for {city}", selectedCity);
-        forecasts = await WeatherApi.GetWeatherAsync(selectedCity);
+        isLoading = true;
+        Logger.LogInformation("Getting weather forecast for {city} via StrawberryShake GraphQL", selectedCity);
+
+        try
+        {
+            var result = await WeatherClient.GetWeatherForecasts.ExecuteAsync(selectedCity);
+
+            if (result.Data is { })
+            {
+                forecasts = [.. result.Data.WeatherForecasts];
+            }
+            else if (result.Errors != null)
+            {
+                Logger.LogError("GraphQL errors: {errors}", string.Join(", ", result.Errors.Select(e => e.Message)));
+                forecasts = new List<IGetWeatherForecasts_WeatherForecasts>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading weather forecasts for {city}", selectedCity);
+            forecasts = new List<IGetWeatherForecasts_WeatherForecasts>();
+        }
+        finally
+        {
+            isLoading = false;
+        }
     }
 }

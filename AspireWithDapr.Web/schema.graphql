@@ -1,0 +1,35 @@
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+type Query {
+  weatherForecasts(city: String!): [WeatherForecast!]!
+}
+
+type Mutation {
+  addWeatherForecast(forecast: WeatherForecastInput!): WeatherForecast!
+}
+
+type Subscription {
+  onWeatherForecast(city: String!): WeatherForecast!
+}
+
+type WeatherForecast {
+  city: String!
+  date: DateTime!
+  temperatureC: Int!
+  temperatureF: Int!
+  summary: String!
+}
+
+input WeatherForecastInput {
+  city: String!
+  date: DateTime!
+  temperatureC: Int!
+  summary: String!
+}
+
+"The `DateTime` scalar represents an ISO-8601 compliant date time type."
+scalar DateTime

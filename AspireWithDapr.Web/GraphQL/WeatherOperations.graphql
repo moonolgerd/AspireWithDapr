@@ -1,0 +1,29 @@
+query GetWeatherForecasts($city: String!) {
+  weatherForecasts(city: $city) {
+    city
+    date
+    temperatureC
+    temperatureF
+    summary
+  }
+}
+
+subscription OnWeatherForecast($city: String!) {
+  onWeatherForecast(city: $city) {
+    city
+    date
+    temperatureC
+    temperatureF
+    summary
+  }
+}
+
+mutation AddWeatherForecast($forecast: WeatherForecastInput!) {
+  addWeatherForecast(forecast: $forecast) {
+    city
+    date
+    temperatureC
+    temperatureF
+    summary
+  }
+}
