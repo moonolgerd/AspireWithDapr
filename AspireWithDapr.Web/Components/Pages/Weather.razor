@@ -1,6 +1,7 @@
 ﻿@page "/weather"
 @using AspireWithDapr.Shared
 @using Microsoft.Extensions.Logging
+@using Microsoft.AspNetCore.Components.QuickGrid
 @* @attribute [StreamRendering(true)]
 @attribute [OutputCache(Duration = 5)] *@
 @rendermode InteractiveServer
@@ -13,49 +14,43 @@
 
 <p>This component demonstrates showing data loaded from a backend API service.</p>
 
-<select title="Select a city" @bind=selectedCity @bind:after=Foo>
-    @foreach (var city in SharedCollections.Cities)
-    {
-        <option>@city</option>
-    }
-</select>
-
-@if (forecasts == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
+<div style="display: flex; gap: 20px;">
+    <div>
+        <ul style="list-style-type: none; padding: 0;">
+            @foreach (var city in SharedCollections.Cities)
             {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
+                <li style="margin-bottom: 8px;">
+                    <button type="button" @onclick="() => SelectCity(city)" style="width: 150px; text-align: left;">@city</button>
+                </li>
             }
-        </tbody>
-    </table>
-}
+        </ul>
+    </div>
+
+    <div style="flex: 1;">
+        @if (forecasts == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <QuickGrid Items="@forecasts.AsQueryable()" Class="table">
+                <PropertyColumn Property="@(f => f.Date)" Title="Date" Format="d" Sortable="true" />
+                <PropertyColumn Property="@(f => f.TemperatureC)" Title="Temp. (C)" Sortable="true" />
+                <PropertyColumn Property="@(f => f.TemperatureF)" Title="Temp. (F)" Sortable="true" />
+                <PropertyColumn Property="@(f => f.Summary)" Title="Summary" Sortable="true" />
+            </QuickGrid>
+        }
+    </div>
+</div>
 
 @code {
     private string selectedCity = "";
 
     private WeatherForecast[]? forecasts;
 
-    private async Task Foo()
+    private async Task SelectCity(string city)
     {
+        selectedCity = city;
         Logger.LogInformation("Getting weather forecast for {city}", selectedCity);
         forecasts = await WeatherApi.GetWeatherAsync(selectedCity);
     }
