@@ -39,9 +39,11 @@ var localFoundry = builder.AddAzureAIFoundry("foundry")
 var apiService = builder.AddProject<Projects.AspireWithDapr_ApiService>("apiservice")
     .WithReplicas(3)
     .WithReference(cache)
-    .WithReference(store)
     .WithReference(seq)
-    .WithDaprSidecar("api")
+    .WithDaprSidecar(p =>
+    {
+        p.WithReference(store);
+    })
     .WaitFor(seq);
 
 builder.AddProject<Projects.AspireWithDapr_Web>("webfrontend")
@@ -54,9 +56,11 @@ builder.AddProject<Projects.AspireWithDapr_Web>("webfrontend")
     .WaitFor(seq);
 
 builder.AddProject<Projects.AspireWithDapr_Publisher>("publisher")
-    .WithDaprSidecar("publisher")
+    .WithDaprSidecar(p =>
+    {
+        p.WithReference(pubsub);
+    })
     .WithExternalHttpEndpoints()
-    .WithReference(pubsub)
     .WithReference(seq)
     .WaitFor(seq);
 
